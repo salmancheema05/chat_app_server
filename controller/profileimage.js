@@ -40,7 +40,7 @@ const userProfile =  async(req,res) =>{
     const imageData = await getProfile([userId])
     const image = imageData.rows[0].image_name.slice(13)
     const imagePathFull = path.join(imagePath,image );
-    res.sendFile(imagePathFull);
+    res.status(200).sendFile(imagePathFull);
   }
     catch(error){
 
