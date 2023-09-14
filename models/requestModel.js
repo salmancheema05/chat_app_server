@@ -22,6 +22,16 @@ const accepted = async (data) =>{
         console.log(error)
     }
 }
+const send = async (data) =>{
+    try{
+        const sendQuery =`INSERT INTO request (sender_id, receiver_id, request_status) VALUES ($1,$2,$3)`
+        return await pool.query(sendQuery,data)
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+
 const deleted = async (data) =>{
     try{
         const updateQuery =`DELETE FROM request WHERE sender_id = $1 AND receiver_id =$2 `
@@ -47,4 +57,4 @@ const searchQuery = async (search) =>{
         console.log(error)
     }
 }
-export { senderData, accepted,deleted, searchQuery }
+export { senderData, accepted,deleted, searchQuery,send }
