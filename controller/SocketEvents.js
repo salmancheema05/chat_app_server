@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { userIsonlineOrOffine } from "../models/userModel.js";
-const chatingSocketIo = (mainServer) => {
+import { fileSave, fetchFile } from "./chatServer.js";
+const Sockethandle = (mainServer) => {
   const io = new Server(mainServer);
   io.on("connection", (socket) => {
     socket.on("yourFriendonline", async (data) => {
@@ -13,12 +14,19 @@ const chatingSocketIo = (mainServer) => {
     });
 
     socket.on("yourFriendOffline", async (data) => {
-      const result = await userIsonlineOrOffine(["offline", data.friendid]);
+      await userIsonlineOrOffine(["offline", data.friendid]);
       socket.broadcast.emit("inactivestatus", data);
     });
     socket.on("newMessageFromMe", async (messageData) => {
-      socket.broadcast.emit("sendMessage", messageData);
+      if (messageData.type == "audiovoice" || messageData.type == "image") {
+        const object = await fileSave(messageData);
+        const fileObject = await fetchFile(object);
+        console.log("fileObject", fileObject);
+        // socket.broadcast.emit("sendMessage", fileObject);
+      } else {
+        socket.broadcast.emit("sendMessage", messageData);
+      }
     });
   });
 };
-export default chatingSocketIo;
+export default Sockethandle;

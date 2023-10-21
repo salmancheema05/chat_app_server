@@ -6,16 +6,16 @@ import { requesttable } from "./createtables/requestTable.js";
 import route from "./route.js";
 import http from "http";
 import cors from "cors";
-import chatingSocketIo from "./controller/ChatSocket.js";
+import Sockethandle from "./controller/SocketEvents.js";
 const app = express();
-const hostName = "192.168.1.4";
+const hostName = "192.168.1.5";
 const server = http.createServer(app);
 const port = 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(route);
-chatingSocketIo(server);
+Sockethandle(server);
 connectdb();
 userTable();
 profileimagetable();
@@ -26,3 +26,4 @@ server.listen(port, hostName, (error) => {
   }
   console.log(`Server is running on:http://${hostName}:${port}`);
 });
+export { server };
