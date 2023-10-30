@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { userIsonlineOrOffine } from "../models/userModel.js";
 import { fileSave, fetchFile } from "./chatServer.js";
+import { ChatInsert } from "./ChatingSave.js";
 const Sockethandle = (mainServer) => {
   const io = new Server(mainServer);
   io.on("connection", (socket) => {
@@ -19,11 +20,19 @@ const Sockethandle = (mainServer) => {
     });
     socket.on("newMessageFromMe", async (messageData) => {
       if (messageData.type == "audiovoice" || messageData.type == "image") {
-        const object = await fileSave(messageData);
-        const fileObject = await fetchFile(object);
-        console.log("fileObject", fileObject);
-        // socket.broadcast.emit("sendMessage", fileObject);
+        const copyObject = { ...messageData };
+        const base64Image = copyObject.chat.toString("base64");
+        copyObject.fileuri = base64Image;
+        socket.broadcast.emit("sendMessage", copyObject);
+        await fileSave(messageData);
       } else {
+        const { chat, senderid, receiverid } = messageData;
+        const textObject = {
+          chat: chat,
+          senderid: senderid,
+          receiverid: receiverid,
+        };
+        await ChatInsert(textObject);
         socket.broadcast.emit("sendMessage", messageData);
       }
     });

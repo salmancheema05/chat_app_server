@@ -3,9 +3,9 @@ const senderData = async (data) => {
   try {
     const receiverId = [data];
     const fetchQuery = `SELECT users.id,users.firstname,users.lastname,profileimage.image_name,	
-            request.request_status FROM users JOIN request
-            ON users.id = request.sender_id JOIN profileimage 
-            ON users.id=profileimage.user_id where request.receiver_id =$1
+              request.request_status FROM users JOIN request
+              ON users.id = request.sender_id LEFT JOIN profileimage 
+              ON users.id=profileimage.user_id where request.receiver_id =$1
         `;
     return await pool.query(fetchQuery, receiverId);
   } catch (error) {

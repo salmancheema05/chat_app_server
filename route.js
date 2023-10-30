@@ -1,5 +1,5 @@
 import express from "express";
-import { login, userLogout } from "./controller/user.js";
+import { login, userLogout, signup } from "./controller/user.js";
 import {
   profileImage,
   upload,
@@ -13,11 +13,14 @@ import {
   sendRequest,
 } from "./controller/request.js";
 import { allfriend } from "./controller/AllFriendsController.js";
+import { fetchChats } from "./controller/ChatingSave.js";
 const route = express.Router();
 route.post("/api/login", login);
+route.post("/api/signup", signup);
 route.post("/api/logout", userLogout);
 route.post("/api/profileimage", upload.single("file"), profileImage);
 route.get("/api/userprofile/:id", userProfile);
+route.get("/api/fetchchats/:senderid/:receiverid", fetchChats);
 route.get("/api/receiverequest/:receiver_id", receiveRequest);
 route.put("/api/acceptedrequest", acceptedrequest);
 route.delete("/api/deletedRequest", deleteRequest);

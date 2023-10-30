@@ -13,6 +13,7 @@ export const userTable = async () => {
                 loginstatus BOOLEAN NOT NULL,
                 activestatus TEXT NOT NULL,
                 search Text NOT NULL,
+                gender Text NOT NULL,
                 token TEXT[],
                 created_at TIMESTAMP DEFAULT NOW()
             ) 

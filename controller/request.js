@@ -16,11 +16,14 @@ const receiveRequest = async (req, res) => {
     const dataArray = fetchData.rows;
     const dataLength = dataArray.length - 1;
     for (let i = 0; i <= dataLength; i++) {
-      let dataObject = fetchData.rows[i];
-      let imageName = dataObject.image_name.slice(13);
-      let imagePathFull = path.join(imagePath, imageName);
-      let imageData = fs.readFileSync(imagePathFull, { encoding: "base64" });
-      dataObject.image_name = imageData;
+      let dataObject = dataArray[i];
+      console.log(dataObject);
+      if (dataObject.image_name != null) {
+        let imageName = dataObject.image_name.slice(13);
+        let imagePathFull = path.join(imagePath, imageName);
+        let imageData = fs.readFileSync(imagePathFull, { encoding: "base64" });
+        dataObject.image_name = imageData;
+      }
       newArray.push(dataObject);
     }
     res.status(200).send(newArray);

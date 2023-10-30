@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import util from "util";
+import { ChatInsert } from "./ChatingSave.js";
 const destinationPath = path.join(process.cwd(), "documents/");
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
@@ -8,8 +9,8 @@ const fileSave = async (file) => {
   try {
     let fileName = null;
     let filePathUri = null;
+    const { fileuri, messageId, senderid, receiverid } = file;
     if (file.type == "audiovoice") {
-      const { fileuri, messageId, type } = file;
       fileName = `recording-${messageId}.3gp`;
       filePathUri = fileuri;
     } else {
@@ -26,9 +27,12 @@ const fileSave = async (file) => {
         writeFileAsync(filePath, filePathUri, { encoding: "base64" });
       }
     });
-    delete file.fileuri;
-    file.fileName = fileName;
-    return file;
+    const fileObject = {
+      text: `file-${fileName}`,
+      senderid: senderid,
+      receiverid: receiverid,
+    };
+    await ChatInsert(fileObject);
   } catch (error) {
     console.error(error);
   }

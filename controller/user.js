@@ -1,5 +1,13 @@
-import { user, TokenSave, logout } from "../models/userModel.js";
+import {
+  user,
+  TokenSave,
+  logout,
+  signupQuery,
+  userExistsORNot,
+} from "../models/userModel.js";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+const saltRounds = 10;
 const login = async (req, res) => {
   try {
     const data = req.body;
@@ -25,7 +33,8 @@ const login = async (req, res) => {
 const verlfyPassword = async (password, data) => {
   try {
     const userPassword = data[0].password;
-    if (userPassword != password) {
+    const hashPassword = await bcrypt.compare(password, userPassword);
+    if (hashPassword == false) {
       return { code: 404, error: "your username and password is wrong" };
     } else {
       const createJwt = await jwtToken(data);
@@ -70,4 +79,34 @@ const userLogout = async (req, res) => {
     console.error(error);
   }
 };
-export { login, userLogout };
+const signup = async (req, res) => {
+  try {
+    const { firstname, lastname, email, username, password, gender } = req.body;
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const seachField = `${firstname} ${lastname} ${username}`;
+    const checkuser = await userExistsORNot([username, email]);
+    if (checkuser.rows[0].count == 1) {
+      res
+        .status(200)
+        .send({ error: "This username or email is already exists" });
+    } else {
+      const result = await signupQuery([
+        firstname,
+        lastname,
+        email,
+        username,
+        hashPassword,
+        false,
+        "offline",
+        seachField,
+        gender,
+      ]);
+      if (result.rowCount == 1) {
+        res.status(200).send({ message: "Your Account has Been Created" });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+export { login, userLogout, signup };
