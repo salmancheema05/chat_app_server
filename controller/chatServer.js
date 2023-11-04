@@ -9,14 +9,14 @@ const fileSave = async (file) => {
   try {
     let fileName = null;
     let filePathUri = null;
-    const { fileuri, messageId, senderid, receiverid } = file;
+    const { chat, id, senderid, receiverid } = file;
     if (file.type == "audiovoice") {
-      fileName = `recording-${messageId}.3gp`;
-      filePathUri = fileuri;
+      fileName = `recording-${id}.3gp`;
+      filePathUri = chat;
     } else {
-      const { name, fileuri } = file;
+      const { name, chat } = file;
       fileName = name;
-      filePathUri = fileuri;
+      filePathUri = chat;
     }
     const filePath = path.join(destinationPath, fileName);
     fs.mkdir(destinationPath, { recursive: true }, (err) => {
@@ -28,7 +28,7 @@ const fileSave = async (file) => {
       }
     });
     const fileObject = {
-      text: `file-${fileName}`,
+      chat: `file-${fileName}`,
       senderid: senderid,
       receiverid: receiverid,
     };

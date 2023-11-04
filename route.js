@@ -22,9 +22,9 @@ route.post("/api/profileimage", upload.single("file"), profileImage);
 route.get("/api/userprofile/:id", userProfile);
 route.get("/api/fetchchats/:senderid/:receiverid", fetchChats);
 route.get("/api/receiverequest/:receiver_id", receiveRequest);
-route.put("/api/acceptedrequest", acceptedrequest);
-route.delete("/api/deletedRequest", deleteRequest);
-route.get("/api/searchpeople/:search", searchPeople);
+route.put("/api/acceptedrequest/:senderid/:receiverid", acceptedrequest);
+route.delete("/api/deletedrequest/:senderid/:receiverid", deleteRequest);
+route.get("/api/searchpeople/:userid/:search", searchPeople);
 route.post("/api/sendrequest", sendRequest);
 route.get("/api/allfriend/:id", allfriend);
 route.get("/", (req, res) => {

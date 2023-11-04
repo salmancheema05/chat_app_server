@@ -40,6 +40,7 @@ const readFile = (data) => {
   const fileBase64 = fs.readFileSync(filePath, { encoding: "base64" });
   data.chat = fileBase64;
   data.type = "audiovoice";
+  data.audiostatus = false;
   return data;
 };
 export { ChatInsert, fetchChats };

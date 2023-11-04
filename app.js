@@ -9,7 +9,7 @@ import cors from "cors";
 import Sockethandle from "./controller/SocketEvents.js";
 import { chatingtable } from "./createtables/chatingtable.js";
 const app = express();
-const hostName = "192.168.1.6";
+const hostName = "192.168.1.8";
 const server = http.createServer(app);
 const port = 5000;
 app.use(cors());

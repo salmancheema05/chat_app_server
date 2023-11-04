@@ -17,7 +17,6 @@ const receiveRequest = async (req, res) => {
     const dataLength = dataArray.length - 1;
     for (let i = 0; i <= dataLength; i++) {
       let dataObject = dataArray[i];
-      console.log(dataObject);
       if (dataObject.image_name != null) {
         let imageName = dataObject.image_name.slice(13);
         let imagePathFull = path.join(imagePath, imageName);
@@ -33,8 +32,9 @@ const receiveRequest = async (req, res) => {
 };
 const acceptedrequest = async (req, res) => {
   try {
-    const data = req.body;
-    const result = await accepted(["accept", data.sender_id, data.receiver_id]);
+    const senderId = req.params.senderid;
+    const receiverId = req.params.receiverid;
+    const result = await accepted(["accept", senderId, receiverId]);
     res.status(200).send({ message: "accepted request" });
   } catch (error) {
     res.status(500).send({ error: "server error" });
@@ -42,13 +42,10 @@ const acceptedrequest = async (req, res) => {
 };
 const deleteRequest = async (req, res) => {
   try {
-    const data = req.body;
-    const result = await deleted([data.sender_id, data.receiver_id]);
-    if (result.rowCount == 1) {
-      res.status(200).send({ message: "remove requested" });
-    } else {
-      res.status(400).send({ error: "something wrong" });
-    }
+    const senderId = req.params.senderid;
+    const receiverId = req.params.receiverid;
+    await deleted([senderId, receiverId]);
+    res.status(200).send({ message: "request remove" });
   } catch (error) {
     res.status(500).send({ error: "server error" });
   }
@@ -69,8 +66,9 @@ const sendRequest = async (req, res) => {
 const searchPeople = async (req, res) => {
   try {
     let newArray = [];
+    const userId = req.params.userid;
     const search = req.params.search;
-    const result = await searchQuery(search);
+    const result = await searchQuery([userId, search]);
     if (result.rowCount >= 1) {
       const arrayLength = result.rows.length;
       for (let i = 0; i < arrayLength; i++) {
