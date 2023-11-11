@@ -18,4 +18,15 @@ const fetchChatsQuery = async (data) => {
     console.log(error);
   }
 };
-export { chatInsert, fetchChatsQuery };
+const updateChatsSeen = async (data) => {
+  try {
+    const fetachQuery = `
+      UPDATE chating SET chatstatus = 'seen' WHERE receiverid IN
+      (SELECT receiverid FROM chating WHERE senderid = $2 AND receiverid = $1)
+    `;
+    return await pool.query(fetachQuery, data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+export { chatInsert, fetchChatsQuery, updateChatsSeen };

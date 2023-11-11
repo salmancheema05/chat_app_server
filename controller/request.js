@@ -4,6 +4,7 @@ import {
   deleted,
   searchQuery,
   send,
+  receiveLastRequest,
 } from "../models/requestModel.js";
 import path from "path";
 import fs from "fs";
@@ -50,14 +51,17 @@ const deleteRequest = async (req, res) => {
     res.status(500).send({ error: "server error" });
   }
 };
-const sendRequest = async (req, res) => {
+const sendRequest = async (sender_id, receiver_id) => {
   try {
-    const data = req.body;
-    const result = await send([data.sender_id, data.receiver_id, "pending"]);
+    const result = await send([sender_id, receiver_id, "pending"]);
     if (result.rowCount == 1) {
-      res.status(200).send({ message: "requst sent" });
+      const lastData = await getNewRequest(
+        result.rows[0].id,
+        result.rows[0].receiver_id
+      );
+      return lastData;
     } else {
-      res.status(400).send({ error: "something wrong" });
+      return { error: "something wrong" };
     }
   } catch (error) {
     res.status(500).send({ error: "server error" });
@@ -93,10 +97,28 @@ const searchPeople = async (req, res) => {
     res.status(500).send({ error: "server error" + error });
   }
 };
+const getNewRequest = async (id, receiver_id) => {
+  try {
+    const fetchData = await receiveLastRequest([receiver_id, id]);
+    const data = fetchData.rows[0];
+    if (data.image_name != null) {
+      let imageName = data.image_name.slice(13);
+      let imagePathFull = path.join(imagePath, imageName);
+      let imageData = fs.readFileSync(imagePathFull, { encoding: "base64" });
+      data.image_name = imageData;
+      return data;
+    } else {
+      return data;
+    }
+  } catch (error) {
+    return { error: "server error" };
+  }
+};
 export {
   receiveRequest,
   acceptedrequest,
   deleteRequest,
   searchPeople,
   sendRequest,
+  getNewRequest,
 };

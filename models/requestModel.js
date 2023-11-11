@@ -3,12 +3,24 @@ const senderData = async (data) => {
   try {
     const receiverId = [data];
     const fetchQuery = `SELECT users.id,users.firstname,users.lastname,profileimage.image_name,	
-    request.request_status FROM users JOIN request
+    request.sender_id ,request.receiver_id,request.request_status FROM users JOIN request
     ON users.id = request.sender_id LEFT JOIN profileimage 
     ON users.id=profileimage.user_id where request.receiver_id =$1
     
     `;
     return await pool.query(fetchQuery, receiverId);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const receiveLastRequest = async (data) => {
+  try {
+    const fetchQuery = `SELECT users.id,users.firstname,users.lastname,profileimage.image_name,	
+    request.request_status,request.receiver_id,request.sender_id  FROM users JOIN request
+    ON users.id = request.sender_id LEFT JOIN profileimage 
+    ON users.id=profileimage.user_id where  request.receiver_id = $1 And request.id=$2
+    `;
+    return await pool.query(fetchQuery, data);
   } catch (error) {
     console.log(error);
   }
@@ -26,7 +38,7 @@ const accepted = async (data) => {
 };
 const send = async (data) => {
   try {
-    const sendQuery = `INSERT INTO request (sender_id, receiver_id, request_status) VALUES ($1,$2,$3)`;
+    const sendQuery = `INSERT INTO request (sender_id, receiver_id, request_status) VALUES ($1,$2,$3) RETURNING id,receiver_id`;
     return await pool.query(sendQuery, data);
   } catch (error) {
     console.log(error);
@@ -78,4 +90,4 @@ const searchQuery = async (data) => {
     console.log(error);
   }
 };
-export { senderData, accepted, deleted, searchQuery, send };
+export { senderData, accepted, deleted, searchQuery, send, receiveLastRequest };

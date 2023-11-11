@@ -1,4 +1,8 @@
-import { chatInsert, fetchChatsQuery } from "../models/ChatModal.js";
+import {
+  chatInsert,
+  fetchChatsQuery,
+  updateChatsSeen,
+} from "../models/ChatModal.js";
 import path from "path";
 import fs from "fs";
 const destinationPath = path.join(process.cwd(), "documents/");
@@ -43,4 +47,11 @@ const readFile = (data) => {
   data.audiostatus = false;
   return data;
 };
-export { ChatInsert, fetchChats };
+const chatsSeen = async (sender_id, receiver_id) => {
+  try {
+    await updateChatsSeen([sender_id, receiver_id]);
+  } catch (error) {
+    console.log(error);
+  }
+};
+export { ChatInsert, fetchChats, chatsSeen };
