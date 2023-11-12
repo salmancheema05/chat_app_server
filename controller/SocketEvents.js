@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { userIsonlineOrOffine } from "../models/userModel.js";
 import { fileSave } from "./chatServer.js";
 import { ChatInsert, chatsSeen } from "./ChatingSave.js";
-import { sendRequest } from "./request.js";
+import { sendRequest, acceptedrequest } from "./request.js";
 
 const Sockethandle = (mainServer) => {
   const io = new Server(mainServer);
@@ -44,6 +44,15 @@ const Sockethandle = (mainServer) => {
         const { sender_id, receiver_id } = data;
         const lastInsertedData = await sendRequest(sender_id, receiver_id);
         socket.broadcast.emit("requestdatareceive", lastInsertedData);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+    socket.on("accept", async (data) => {
+      try {
+        const { sender_id, receiver_id } = data;
+        const lastInsertedData = await acceptedrequest(sender_id, receiver_id);
+        socket.broadcast.emit("accepted", lastInsertedData);
       } catch (error) {
         console.error(error);
       }

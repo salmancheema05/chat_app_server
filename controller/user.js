@@ -7,6 +7,8 @@ import {
 } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 const saltRounds = 10;
 const login = async (req, res) => {
   try {
@@ -50,7 +52,7 @@ const verlfyPassword = async (password, data) => {
 };
 const jwtToken = async (data) => {
   try {
-    const privateKey = "39485hfy7sbgrrgthttrhegh9484742928387";
+    const privateKey = process.env.TOKEN_KEY;
     const { id, firstname, lastname, loginstatus } = data[0];
     const user = { id, firstname, lastname, loginstatus };
     const token = jwt.sign({ user }, privateKey);

@@ -5,6 +5,7 @@ import {
   searchQuery,
   send,
   receiveLastRequest,
+  receiverData,
 } from "../models/requestModel.js";
 import path from "path";
 import fs from "fs";
@@ -31,14 +32,17 @@ const receiveRequest = async (req, res) => {
     res.status(500).send({ error: "server error" });
   }
 };
-const acceptedrequest = async (req, res) => {
+const acceptedrequest = async (senderId, receiverId) => {
   try {
-    const senderId = req.params.senderid;
-    const receiverId = req.params.receiverid;
     const result = await accepted(["accept", senderId, receiverId]);
-    res.status(200).send({ message: "accepted request" });
+    if (result.rowCount == 1) {
+      const lastData = await getReceiverData(result.rows[0].receiver_id);
+      return lastData;
+    } else {
+      return { error: "something wrong" };
+    }
   } catch (error) {
-    res.status(500).send({ error: "server error" });
+    console.log(error);
   }
 };
 const deleteRequest = async (req, res) => {
@@ -56,9 +60,10 @@ const sendRequest = async (sender_id, receiver_id) => {
     const result = await send([sender_id, receiver_id, "pending"]);
     if (result.rowCount == 1) {
       const lastData = await getNewRequest(
-        result.rows[0].id,
+        result.rows[0].sender_id,
         result.rows[0].receiver_id
       );
+
       return lastData;
     } else {
       return { error: "something wrong" };
@@ -97,9 +102,9 @@ const searchPeople = async (req, res) => {
     res.status(500).send({ error: "server error" + error });
   }
 };
-const getNewRequest = async (id, receiver_id) => {
+const getNewRequest = async (sender_id, receiver_id) => {
   try {
-    const fetchData = await receiveLastRequest([receiver_id, id]);
+    const fetchData = await receiveLastRequest([receiver_id, sender_id]);
     const data = fetchData.rows[0];
     if (data.image_name != null) {
       let imageName = data.image_name.slice(13);
@@ -114,6 +119,24 @@ const getNewRequest = async (id, receiver_id) => {
     return { error: "server error" };
   }
 };
+const getReceiverData = async (receiver_id) => {
+  try {
+    const fetchData = await receiverData([receiver_id]);
+    const data = fetchData.rows[0];
+    if (data.image_name != null) {
+      let imageName = data.image_name.slice(13);
+      let imagePathFull = path.join(imagePath, imageName);
+      let imageData = fs.readFileSync(imagePathFull, { encoding: "base64" });
+      data.image_name = imageData;
+      return data;
+    } else {
+      return data;
+    }
+  } catch (error) {
+    return { error: "server error" };
+  }
+};
+
 export {
   receiveRequest,
   acceptedrequest,
